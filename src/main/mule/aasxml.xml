@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<flow name="Quis3" doc:id="e8015859-a89b-4726-847b-bf050523190e" >
+		<http:listener doc:name="Listener" doc:id="ac51b03c-ac1e-434f-b92f-65fe673a7377" path="/ques3" config-ref="HTTP_Listener_config1"/>
+		<db:select doc:name="Select" doc:id="82b237d0-f400-4d35-9c3e-2ea489fd2aa0" target="morder" config-ref="CloudDb">
+			<db:sql><![CDATA[select * from orders]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="d2157c50-b6a3-4cea-ace8-5df2d25daf40" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.morder map (k,v) -> 
+	amount:k.amount filter ( k.amount > 5000)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<file:write doc:name="Write" doc:id="eb54a748-d98e-45aa-935d-a584a33b6996" path="C:\Users\Hanna Ollana\Documents\file\amountG" mode="APPEND" config-ref="File_Config1"/>
+		<ee:transform doc:name="Transform Message" doc:id="ea45972b-7705-4e98-b10d-a8e30fb9bd62" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.morder map (k,v) -> 
+	amount:k.amount filter ( k.amount < 5000)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<file:write doc:name="Write" doc:id="27e99f9d-3e6e-43b6-b841-0a0679f1fe52" path="C:\Users\Hanna Ollana\Documents\file\amountL" config-ref="File_Config1"/>
+		<set-payload value="data written" doc:name="Set Payload" doc:id="93b09817-03f3-4bbc-9108-f5d92274c1fc" />
+	</flow>
+	<flow name="Ques2" doc:id="8f8939c0-de6c-477b-a360-49553948cd48" >
+		<http:listener doc:name="Listener" doc:id="f5fda56b-172a-4ff1-92e4-419bdc9cb5d1" path="/ques2" config-ref="HTTP_Listener_config1"/>
+		<choice doc:name="Choice" doc:id="db8d9109-c7b0-4372-a5ff-ce4178307da7" >
+			<when expression='#[attributes.queryParams.TableName=="UserData"]'>
+				<db:select doc:name="Select" doc:id="dad1d0bd-30d7-49ef-ac51-bb7978ef7490" config-ref="CloudDb">
+					<db:sql ><![CDATA[select * from UserData]]></db:sql>
+				</db:select>
+				<ee:transform doc:name="Transform Message" doc:id="e8fdf35d-ebf7-463a-b834-11485ee5a126" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[attributes.queryParams.TableName=="tb_product"]'>
+				<db:select doc:name="Select" doc:id="ab4cf11a-452e-4271-bf13-742c3d133bb5" config-ref="CloudDb">
+					<db:sql ><![CDATA[select * from tb_product]]></db:sql>
+				</db:select>
+				<ee:transform doc:name="Transform Message" doc:id="cb42befb-b5af-4618-9ec4-ee6cdac9c2a0" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<set-payload value="Table not found" doc:name="Set Payload" doc:id="5c6faedd-e73d-4f6e-a8e6-c4e923ebdef5" />
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="ques4" doc:id="89515d29-70f1-48e4-acd2-18de9ae390b7" >
+		<http:listener doc:name="Listener" doc:id="1e9b4d0c-b911-4289-a5a5-a371db33b6db" path="/ques4" config-ref="HTTP_Listener_config1"/>
+		<choice doc:name="Choice" doc:id="65d01b83-702d-400f-8492-7f33c6c8448a" >
+			<when expression="#[attributes.queryParams.num&lt;10]">
+				<choice doc:name="Choice" doc:id="542d4dee-b226-4f56-9fe7-188b2882fa69" >
+					<when expression="#[attributes.queryParams.num=='1']">
+						<set-payload value="num is one" doc:name="Set Payload" doc:id="0061012b-070b-4a2f-8d25-be97f566ac58" />
+					</when>
+					<otherwise >
+						<set-payload value="num is less than 10" doc:name="Set Payload" doc:id="de3a31fe-c877-470d-8999-080dab2b2501" />
+					</otherwise>
+				</choice>
+			</when>
+			<when expression="#[attributes.queryParams.num=='10']">
+				<set-payload value="num is 10" doc:name="Set Payload" doc:id="780582b8-cc8c-4f4a-a2cb-d535fc88bc19" />
+			</when>
+			<otherwise >
+				<set-payload value="num is greater than 10" doc:name="Set Payload" doc:id="1c4e8aca-569d-43f4-badb-4301c114f688" />
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="Logger" doc:id="9546a8b6-73c8-49f0-ba02-e53877c266a9" message="#[payload]"/>
+	</flow>
+	<flow name="Ques1" doc:id="9d057fb0-6237-49d8-a628-06ea3da290cd" >
+		<http:listener doc:name="Listener" doc:id="5bb39049-5af4-45c7-b2ab-2263cedba046" path="/fetch" config-ref="HTTP_Listener_config1"/>
+		<logger level="INFO" doc:name="Logger" doc:id="0405f4b9-87d8-4c82-856d-ec3edaf1e5b4" message="#[payload]"/>
+		<db:select doc:name="Select" doc:id="ce11de74-a457-48ba-b983-8e8e9a777f4a" config-ref="CloudDb">
+			<db:sql ><![CDATA[select * from tb_product]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="5dace688-213e-48b7-a17b-c7745ec8dd9b">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/json 
+---
+//payload filter((value,index)-> value.price>5000)
+
+ 
+payload map  {
+id :$.id, 
+product_name:$.product_name, 
+description:$.description, 
+video_url:$.video_url,
+ category_id:$.category_id, 
+ price:$.price>5000
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+		<db:bulk-insert doc:name="Bulk insert" doc:id="80a2e621-613b-465f-9aa7-25f1627cf9c0" config-ref="localDB">
+							<db:sql><![CDATA[insert into tb_product(id, product_name, description, video_url, category_id, price)
+values(:id, :product_name, :description, :video_url, :category_id, :price)]]></db:sql>
+						</db:bulk-insert>
+		<set-payload value="data inserted" doc:name="Set Payload" doc:id="fa5353a0-ac0b-48e5-b917-88a6267e8ae3" />
+	</flow>
+</mule>

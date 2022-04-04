@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<http:listener-config name="HTTP_Listener_config1" doc:name="HTTP Listener config" doc:id="cab75788-6b52-4821-a9f2-1fab687e5cca" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<file:config name="File_Config1" doc:name="File Config" doc:id="57ea5a9f-7960-46f8-817d-0eea7e2e5e26" >
+		<file:connection workingDir="C:\Users\Hanna Ollana\Documents\file" />
+	</file:config>
+	<db:config name="CloudDb" doc:name="Database Config" doc:id="8a061be8-88e5-4926-8d6e-a85fac790112" >
+		<db:my-sql-connection host="db.icraftsoft.net" port="3306" user=" mulesoftuser" password="Cr@fTMule$oFt" database="mulesoftdb" />
+	</db:config>
+	<db:config name="localDB" doc:name="Database Config" doc:id="e2152e2e-86ca-4455-b415-847b372f06f9" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Root" database="craftonlineshoping" />
+	</db:config>
+</mule>
